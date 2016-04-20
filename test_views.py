@@ -65,7 +65,7 @@ class URLTest(unittest.TestCase):
         result = self.client.get('/weather_forecast?address=')
         self.assertEqual(result.status_code, 400)
 
-    @patch('app.geocode_api_parser.Geocode.is_place_query_valid')
+    @patch('app.geolocation_api_parser.Geolocation.is_place_query_valid')
     def test_invalid_weather_url_invalid_address(self, is_place_query_valid,):
         is_place_query_valid.return_value = False
         result = self.client.get('/weather_forecast?address=pppppppppp')
@@ -73,8 +73,9 @@ class URLTest(unittest.TestCase):
         self.assertEqual(result.status_code, 400)
 
     @patch('app.weather_parser.WeatherForecast.generate_forecast')
-    @patch('app.geocode_api_parser.Geocode.get_address_query')
-    def test_valid_weather_url_valid_address(self, get_address_query, generate_forecast):
+    @patch('app.geolocation_api_parser.Geolocation.local_time')
+    @patch('app.geolocation_api_parser.Geolocation.get_address_query')
+    def test_valid_weather_url_valid_address(self, get_address_query, local_time, generate_forecast):
         get_address_query.return_value = {
         'results': [{
             'geometry': {
@@ -85,6 +86,7 @@ class URLTest(unittest.TestCase):
         }], 
         'status': 'OK'
         }
+        local_time = '2013-05-06T12:00:00'
         mock_currently = {
         'currently': {
             'summary': 'Partly Cloudy',
